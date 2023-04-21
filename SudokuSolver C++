@@ -1,0 +1,248 @@
+// COPYRIGHTS.© ABANOB AYOUB
+// Description: Given a Sudoku "array" in the implementation, the code will solve it once you press "run"
+
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+
+//Function Prototype
+void crossHatch(int currentDigit);
+void checkEachGroup();
+
+//Global Declratrion
+const int ROWSIZE = 9;
+const int COLSIZE = 9;
+
+int currentDigit = 1;
+int mySudoku[ROWSIZE][COLSIZE] =
+{
+	{5,3,4,0,7,0,9,1,2},
+	{6,0,0,1,9,5,0,0,8},
+	{0,9,8,0,0,0,0,6,0},
+	{8,0,0,0,6,0,0,0,3},
+	{4,0,0,8,0,3,0,0,1},
+	{7,0,0,0,2,0,0,0,6},
+	{0,6,0,0,0,0,2,8,4},
+	{2,8,7,4,1,9,0,0,5},
+	{3,4,5,0,8,0,0,7,9}
+};
+int myTempSudoku[ROWSIZE][COLSIZE] =
+{
+	{5,3,4,0,7,0,9,1,2},
+	{6,0,0,1,9,5,0,0,8},
+	{0,9,8,0,0,0,0,6,0},
+	{8,0,0,0,6,0,0,0,3},
+	{4,0,0,8,0,3,0,0,1},
+	{7,0,0,0,2,0,0,0,6},
+	{0,6,0,0,0,0,2,8,4},
+	{2,8,7,4,1,9,0,0,5},
+	{3,4,5,0,8,0,0,7,9}
+};
+int crossHatchArr[ROWSIZE][COLSIZE] =
+{
+	{1,1,1,1,1,1,1,1,1},
+	{1,1,1,1,1,1,1,1,1},
+	{1,1,1,1,1,1,1,1,1},
+	{1,1,1,1,1,1,1,1,1},
+	{1,1,1,1,1,1,1,1,1},
+	{1,1,1,1,1,1,1,1,1},
+	{1,1,1,1,1,1,1,1,1},
+	{1,1,1,1,1,1,1,1,1},
+	{1,1,1,1,1,1,1,1,1}
+};
+int numOfZeros = 0;
+int spotRowLocation = -1;
+int spotColLocation = -1;
+int hasTheConsideredNum = 0;
+int rowGroupCoun = 0;
+int colGroupCoun = 0;
+bool gameDone = false;
+
+
+int main() {
+
+	//Calculations
+
+	while (gameDone == false) {
+		crossHatch(currentDigit);
+		checkEachGroup();
+
+		//Aftre Checking all groups of 9 digits,,, 
+		rowGroupCoun = 0;//reset rowGroupCoun
+		colGroupCoun = 0; //reset colGroupCoun
+		for (int i = 0; i < COLSIZE; i++)//reset the myTempSudokuArr
+		{
+			for (int k = 0; k < ROWSIZE; k++)
+			{
+				myTempSudoku[k][i] = mySudoku[k][i];
+			}
+		}
+		//check if the game is done or not yet
+		numOfZeros = 0;
+		for (int row = 0; row < ROWSIZE; row++) {
+			for (int col = 0; col < COLSIZE; col++) {
+				if (mySudoku[row][col] == 0) {
+					gameDone = false;
+					break;
+				}
+				else
+					gameDone = true;
+			}
+			if (gameDone == false) {
+				break;
+			}
+		}
+
+		if (currentDigit < 9 && gameDone == false) { //increase the currentDigit as long as it's not 9 and the game hasn't finished yet
+			currentDigit += 1;
+		}
+		else if (currentDigit == 9 && gameDone == false) {
+			currentDigit = 1;
+		}
+		else if (gameDone == true) {
+			break;
+		}
+	}
+
+	//Output
+	for (int row = 0; row < ROWSIZE; row++) {
+		for (int col = 0; col < COLSIZE; col++) {
+			cout << mySudoku[row][col] << "   ";
+		}
+		cout << endl;
+	}
+	return 0;
+}
+
+	
+void crossHatch(int currentDigit)
+{
+	for (int currentRow = 0; currentRow < ROWSIZE; currentRow++)
+	{
+		for (int currentCol = 0; currentCol < COLSIZE; currentCol++)
+		{
+			if (mySudoku[currentRow][currentCol] == currentDigit) //check whether the current square has the number you are consedring or not
+			{
+				spotRowLocation = currentRow;//save its row location
+				spotColLocation = currentCol;//save its col location
+
+				//Cross Hatching the tempSudokuArr to not lose the original Sudoku game
+				for (int crossHatchRow = 0; crossHatchRow < ROWSIZE; crossHatchRow++) {//Cross Hatch its Column
+					myTempSudoku[crossHatchRow][spotColLocation] = crossHatchArr[crossHatchRow][spotColLocation];
+				}
+				for (int crossHatchCol = 0; crossHatchCol < COLSIZE; crossHatchCol++) {//Cross Hatch its Row
+					myTempSudoku[spotRowLocation][crossHatchCol] = crossHatchArr[spotRowLocation][crossHatchCol];
+				}
+			}
+		}
+	}
+
+}
+
+void checkEachGroup()
+{
+	int groupsCounter = 0;
+	while (groupsCounter < 9)
+	{
+		hasTheConsideredNum = 0;
+		numOfZeros = 0;
+		int holdRowGrpCounValu = rowGroupCoun;
+		int holdColGrpCounValu = colGroupCoun;
+
+		while (rowGroupCoun < holdRowGrpCounValu + 3) {//Check whether the group has the considered num or not
+			colGroupCoun = holdColGrpCounValu;
+			while (colGroupCoun < holdColGrpCounValu + 3) {     //<<<<<<<somthing wrong
+				if (mySudoku[rowGroupCoun][colGroupCoun] == currentDigit) {
+					hasTheConsideredNum += 1;
+				}
+				colGroupCoun += 1;
+			}
+			rowGroupCoun += 1;
+		}
+		
+		if (hasTheConsideredNum == 0) //if the group doesn't include the current number you consider, check the number of empty squares on it
+		{
+			for (int row = holdRowGrpCounValu; row < rowGroupCoun; row++)
+			{
+				for (int col = holdColGrpCounValu; col < colGroupCoun; col++)
+				{
+					if (myTempSudoku[row][col] == 0) {
+						numOfZeros += 1;
+						spotRowLocation = row;
+						spotColLocation = col;
+					}
+				}
+			}
+			if (numOfZeros == 1) { //if the group has only one empty square, place the current consider number on the square
+				mySudoku[spotRowLocation][spotColLocation] = currentDigit;
+				//Cross Hatch its Column and Row and then start from the begging
+				for (int crossHatchRow = 0; crossHatchRow < ROWSIZE; crossHatchRow++) {//Cross Hatch its Column
+					myTempSudoku[crossHatchRow][spotColLocation] = crossHatchArr[crossHatchRow][spotColLocation];
+				}
+				for (int crossHatchCol = 0; crossHatchCol < COLSIZE; crossHatchCol++) {//Cross Hatch its Row
+					myTempSudoku[spotRowLocation][crossHatchCol] = crossHatchArr[spotRowLocation][crossHatchCol];
+				}
+				groupsCounter = 0;
+				rowGroupCoun = 0;
+				colGroupCoun= 0;
+			}
+			else { //if the group has more than one empty square, move on to the next group of 9 digits
+				groupsCounter += 1;
+				if (colGroupCoun < 9 && rowGroupCoun < 4) { //Top Three groups
+					colGroupCoun = colGroupCoun;
+					rowGroupCoun = 0;
+				}
+				else if (colGroupCoun == 9 && rowGroupCoun == 3) {//In the Last Group on the top right
+					colGroupCoun = 0;
+					rowGroupCoun = 3;
+				}
+				else if (colGroupCoun < 9 && rowGroupCoun < 7) {
+					colGroupCoun = colGroupCoun;
+					rowGroupCoun = 3;
+				}
+				else if (colGroupCoun == 9 && rowGroupCoun == 6) {
+					colGroupCoun = 0;
+					rowGroupCoun = 6;
+				}
+				else if (colGroupCoun < 9 && rowGroupCoun < 10) {
+					colGroupCoun = colGroupCoun;
+					rowGroupCoun = 6;
+				}
+				else if (colGroupCoun == 9 && rowGroupCoun == 9) {
+					break;
+				}
+			}
+		}
+		else { //Move on to the next group of 9 digits
+			groupsCounter += 1;
+			if (colGroupCoun < 9 && rowGroupCoun < 4) { //Top Three groups
+				colGroupCoun = colGroupCoun;
+				rowGroupCoun = 0;
+			}
+			else if (colGroupCoun == 9 && rowGroupCoun== 3) {//In the Last Group on the top right
+				colGroupCoun = 0;
+				rowGroupCoun= 3;
+			}
+			else if (colGroupCoun<9  && rowGroupCoun< 7) {
+				colGroupCoun = colGroupCoun;
+				rowGroupCoun = 3;
+			}
+			else if (colGroupCoun == 9 && rowGroupCoun== 6) {
+				colGroupCoun = 0;
+				rowGroupCoun= 6;
+			}
+			else if (colGroupCoun<9 && rowGroupCoun<10 ) {
+				colGroupCoun = colGroupCoun;
+				rowGroupCoun= 6;
+			}
+			else if (colGroupCoun== 9 && rowGroupCoun== 9) { 
+				break;
+			}
+		}
+	}
+}//END
+
+// COPYRIGHTS.© ABANOB AYOUB
+// COPYRIGHTS.© ABANOB AYOUB
